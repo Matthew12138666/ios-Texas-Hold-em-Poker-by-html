@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="zh-Hans">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, user-scalable=no">
+  <meta name="theme-color" content="#0a1210">
+  <meta name="apple-mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+  <meta name="apple-mobile-web-app-title" content="Texas Hold'em Poker">
+  <meta name="description" content="Texas Hold'em Poker">
+  <title>Texas Hold'em Poker</title>
+  <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <div id="app" class="app">
+    <header class="status-bar">
+      <span class="status-bar__title">Texas Hold'em Poker</span>
+      <span class="status-bar__phase" id="game-phase-label">Main Menu</span>
+      <button type="button" class="status-bar__settings" id="btn-open-lobby" aria-label="Settings">Settings</button>
+    </header>
+
+    <main class="table-stage" id="table-stage">
+      <section class="felt felt--visual" id="felt" aria-hidden="true"></section>
+
+      <aside class="ai-rail ai-rail--left" id="ai-rail-left" aria-label="Left rail"></aside>
+      <aside class="ai-rail ai-rail--right" id="ai-rail-right" aria-label="Right rail"></aside>
+
+      <div class="table-center" id="table-center">
+        <div class="pot" id="pot-display">
+          <span class="pot__label">Pot</span>
+          <span class="pot__amount" id="pot-amount">0</span>
+        </div>
+        <div class="showdown-title is-hidden" id="showdown-title" aria-hidden="true">Showdown</div>
+        <div class="showdown-status is-hidden" id="showdown-status" aria-live="polite"></div>
+      
+        <section class="board" aria-label="Public Cards">
+          <div class="board-labels">
+            <span class="board-label board-label--flop">Flop</span>
+            <span class="board-label board-label--turn">Turn</span>
+            <span class="board-label board-label--river">River</span>
+          </div>
+          <div class="board-cards" id="board-cards"></div>
+        </section>
+        <div class="deck-origin" id="deck-origin" aria-hidden="true"></div>
+        
+        <div class="hand-eval-log is-hidden" id="hand-eval-log" style="display: none !important; opacity: 0 !important; pointer-events: none;" aria-live="polite"></div>
+        <div class="showdown-banner is-hidden" id="showdown-banner" style="display: none !important; opacity: 0 !important; pointer-events: none;" role="status"></div>
+      </div>
+
+      <section class="hero-dock" id="hero-zone" aria-label="player">
+        <span class="seat-badge seat-badge--dealer is-hidden" id="hero-dealer-badge" title="Dealer">Ⓓ</span>
+        <span class="seat-badge seat-badge--blind is-hidden" id="hero-blind-badge"></span>
+        <div class="seat-action-bubble is-hidden" id="hero-action-bubble" aria-hidden="true"></div>
+        <div class="hole-cards hole-cards--hero" id="hero-hole-cards"></div>
+        <div class="player-info player-info--hero">
+          <div class="player-avatar player-avatar--hero" aria-hidden="true">You</div>
+          <div class="player-meta">
+            <h2 class="player-name">You</h2>
+            <p class="player-chips">
+              <span class="chip-icon" aria-hidden="true"></span>
+              <span class="player-chips__value" id="hero-chips">10,000</span>
+            </p>
+          </div>
+        </div>
+      </section>
+    </main>
+
+    <button type="button" class="btn-skip-deal is-hidden" id="btn-skip-deal">Skip</button>
+    <button type="button" class="btn-skip-showdown is-hidden" id="btn-skip-showdown">Skip</button>
+    <button type="button" class="btn-exit-game is-hidden" id="btn-exit-game">Exit game</button>
+
+    <aside class="cheat-panel" id="cheat-panel">
+      <button type="button" class="cheat-panel__toggle" id="cheat-toggle" aria-expanded="true">
+        <span>Cheat</span>
+        <span class="cheat-panel__arrow" aria-hidden="true">▼</span>
+      </button>
+      <div class="cheat-panel__body" id="cheat-body">
+        <button type="button" class="cheat-btn" id="btn-god-eye">God's eye</button>
+        <button type="button" class="cheat-btn" id="btn-infinite-chips">往里豪！</button>
+      </div>
+    </aside>
+    <button type="button" class="rank-panel-toggle" id="btn-rank-toggle">📊 RANK</button>
+
+    <footer class="action-bar is-disabled" id="action-bar" aria-label="Betting action">
+      <div class="action-bar__bet-info">
+        <span class="action-bar__label" id="action-hint">Waiting for start</span>
+        <span class="action-bar__to-call" id="to-call">0</span>
+      </div>
+      <div class="raise-multiples" id="raise-multiples" aria-label="Raise multiples">
+        <button type="button" class="raise-multiples__btn" data-mult="2">2×<span class="btn__subtitle"></span></button>
+        <button type="button" class="raise-multiples__btn" data-mult="4">4×<span class="btn__subtitle"></span></button>
+        <button type="button" class="raise-multiples__btn" data-mult="6">6×<span class="btn__subtitle"></span></button>
+        <button type="button" class="raise-multiples__btn" data-mult="8">8×<span class="btn__subtitle"></span></button>
+        <button type="button" class="raise-multiples__btn" data-mult="10">10×<span class="btn__subtitle"></span></button>
+      </div>
+      <div class="action-buttons action-buttons--five">
+        <button type="button" class="btn btn--fold" id="btn-fold" data-action="fold" disabled>
+          <span class="btn__title">Fold</span>
+          <span class="btn__subtitle">Coward</span>
+        </button>
+        <button type="button" class="btn btn--check" id="btn-check" data-action="check" disabled>
+          <span class="btn__title">Check</span>
+          <span class="btn__subtitle">Same as left</span>
+        </button>
+        <button type="button" class="btn btn--call" id="btn-call" data-action="call" disabled>
+          <span class="btn__title">Call</span>
+          <span class="btn__subtitle">Might as well go home</span>
+        </button>
+        <button type="button" class="btn btn--raise" id="btn-raise" data-action="raise" disabled>
+          <span class="btn__title">Raise</span>
+          <span class="btn__subtitle">pls tap the 10x button</span>
+        </button>
+        <button type="button" class="btn btn--allin" id="btn-allin" data-action="allin" disabled>
+          <span class="btn__title">All-in</span>
+          <span class="btn__subtitle">let's gooooooooooooo!</span>
+        </button>
+      </div>
+    </footer>
+  </div>
+
+
+  <div class="hand-end-overlay is-hidden" id="hand-end-overlay" style="position: fixed; top: 0; left: 0; width: 100%; height: 100%; cursor: pointer; z-index: 9999;">
+    <div id="click-anywhere-hint" style="position: absolute; bottom: 32%; left: 50%; transform: translateX(-50%); color: rgba(232, 197, 71, 0.95); font-weight: 900; letter-spacing: 2px; font-size: 14px; text-shadow: 0 2px 12px rgba(0, 0, 0, 0.9); animation: pulse 1.5s infinite; pointer-events: none; background: rgba(0, 0, 0, 0.7); padding: 8px 22px; border-radius: 30px; border: 1px solid rgba(255, 255, 255, 0.15); white-space: nowrap;">
+      Tap anywhere to continue
+    </div>
+    <div class="hand-end-panel" style="display: none !important;">
+      <pre id="hand-end-summary"></pre>
+      <button type="button" id="btn-next-hand"></button>
+      <button type="button" id="btn-hand-end-lobby"></button>
+    </div>
+  </div>
+
+  <div id="custom-showdown-rank" class="is-hidden" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); background: rgba(20, 31, 28, 0.95); border: 2px solid rgba(232, 197, 71, 0.5); border-radius: 12px; padding: 18px 24px; min-width: 290px; box-shadow: 0 16px 40px rgba(0, 0, 0, 0.85); z-index: 116;">
+    <div style="color: #e8c547; font-size: 16px; font-weight: 900; text-align: center; border-bottom: 1px solid rgba(255, 255, 255, 0.15); padding-bottom: 10px; margin-bottom: 12px; letter-spacing: 2px; text-shadow: 0 0 8px rgba(232, 197, 71, 0.4);">
+      🏆 RANK LIST
+    </div>
+    <div id="custom-rank-rows" style="display: flex; flex-direction: column; gap: 10px;"></div>
+  </div>
+
+  <div class="lobby-overlay" id="lobby-overlay" role="dialog" aria-modal="true" aria-labelledby="lobby-title">
+    <div class="lobby-panel">
+      <header class="lobby-panel__header">
+        <h1 class="lobby-panel__title" id="lobby-title">Menu</h1>
+        <p class="lobby-panel__subtitle">Single player Texas Hold'em Poker · After selecting the opponent,  tap the start button to start</p>
+      </header>
+      <div class="lobby-panel__body">
+        <section class="lobby-field">
+          <label class="lobby-field__label" for="ai-count-display">AI player count</label>
+          <div class="stepper" id="ai-count-stepper">
+            <button type="button" class="stepper__btn" id="btn-ai-minus" aria-label="Decrease AI count">−</button>
+            <output class="stepper__value" id="ai-count-display" for="ai-count-stepper">1</output>
+            <button type="button" class="stepper__btn" id="btn-ai-plus" aria-label="Increase AI count">+</button>
+          </div>
+          <p class="lobby-field__hint">Range 1 – 8 players (excluding you)</p>
+        </section>
+        <section class="lobby-field">
+          <label class="lobby-field__label" for="loop-count-display">Loop count (each player has been the dealer once = 1 loop)</label>
+          <div class="stepper" id="loop-count-stepper">
+            <button type="button" class="stepper__btn" id="btn-loop-minus" aria-label="Decrease loop count">−</button>
+            <output class="stepper__value" id="loop-count-display" for="loop-count-stepper">1</output>
+            <button type="button" class="stepper__btn" id="btn-loop-plus" aria-label="Increase loop count">+</button>
+          </div>
+          <p class="lobby-field__hint">The more loops, the closer to the real offline tug-of-war (chip inheritance across rounds)</p>
+        </section>
+        <section class="lobby-field">
+          <label class="lobby-field__label" for="blind-preset-select">Base blind size (Base Blinds)</label>
+          <select class="lobby-select" id="blind-preset-select" aria-describedby="blind-preset-hint">
+            <option value="0">10 / 20 (Small blind 10 · Big blind 20)</option>
+            <option value="1" selected>50 / 100 (Small blind 50 · Big blind 100)</option>
+            <option value="2">100 / 200 (Small blind 100 · Big blind 200)</option>
+          </select>
+          <p class="lobby-field__hint" id="blind-preset-hint">Only after clicking "Start game" will the deck be shuffled, the blinds be taken, and the cards be dealt</p>
+        </section>
+        <section class="lobby-field">
+          <label class="lobby-field__label" for="starting-chips-input">Starting chips (per player)</label>
+          <input
+            class="lobby-input"
+            id="starting-chips-input"
+            type="number"
+            inputmode="numeric"
+            min="1000"
+            max="1000000"
+            step="100"
+            value="10000"
+            aria-describedby="starting-chips-hint"
+          >
+          <p class="lobby-field__hint" id="starting-chips-hint">Range 1,000 – 1,000,000 (default 10,000)</p>
+        </section>
+        <section class="lobby-field">
+          <span class="lobby-field__label" id="difficulty-label">AI difficulty</span>
+          <div class="difficulty-list" id="difficulty-list" role="radiogroup" aria-labelledby="difficulty-label"></div>
+        </section>
+        <section class="lobby-field">
+          <label class="lobby-field__label" for="setting-ai-delay">AI thinking speed (delay)</label>
+          <div class="delay-slider-wrapper">
+            <input type="range" id="setting-ai-delay" min="1" max="10" value="4" step="1">
+            <output class="delay-value" id="delay-value-display" for="setting-ai-delay">4</output>
+            <span class="delay-unit">seconds</span>
+          </div>
+          <p class="lobby-field__hint">The larger the value, the slower the AI will think (1-10 seconds)</p>
+        </section>
+        <section class="lobby-summary">
+          <p class="lobby-summary__line">Number of players in this hand: <strong id="summary-players">2</strong> players</p>
+          <p class="lobby-summary__line">Current difficulty: <strong id="summary-difficulty">★ PDB</strong></p>
+          <p class="lobby-summary__line">Blinds: <strong id="summary-blinds">50 / 100</strong></p>
+          <p class="lobby-summary__line">Loop count: <strong id="summary-loops">1</strong> loops</p>
+          <p class="lobby-summary__line">Starting chips: <strong id="summary-starting-chips">10,000</strong></p>
+        </section>
+      </div>
+      <footer class="lobby-panel__footer">
+        <button type="button" class="btn-lobby-start" id="btn-start-game">▶ Start game </button>
+      </footer>
+    </div>
+  </div>
+
+  <script src="settings.js"></script>
+  <script src="game.js"></script>
+  <script src="ai-engine.js"></script>
+
+  <script>
+    (function () {
+      "use strict";
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js").then(function (registration) {
+          console.log("PWA Ready");
+        }).catch(function (err) {
+          console.error("SW registration failed: " + err);
+        });
+      }
+    })();
+  </script>
+</body>
+</html>
