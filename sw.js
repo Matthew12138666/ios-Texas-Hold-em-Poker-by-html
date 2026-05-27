@@ -5,7 +5,7 @@
 
 "use strict";
 
-var CACHE_NAME = "texas-holdem-v4";
+var CACHE_NAME = "texas-holdem-v3";
 
 var STATIC_ASSETS = [
   "index.html",
