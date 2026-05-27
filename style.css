@@ -381,12 +381,12 @@ button {
 }
 
 .ai-seat--left .seat-chips-overlay {
-  left: 80%;
+  left: 150%;
   transform: translateX(-50%);
 }
 
 .ai-seat--right .seat-chips-overlay {
-  left: 20%;
+  left: -50%;
   transform: translateX(-50%);
 }
 
