@@ -67,8 +67,11 @@ html {
 }
 
 body {
-  min-height: 100%;
-  min-height: 100dvh;
+  position: relative;
+  min-height: 100vh; /* iOS standalone 中 100dvh 会崩塌为 0，必须用 100vh + JS 兜底 */
+  min-height: var(--ios-vh, 100vh);
+  height: 100vh;
+  height: var(--ios-vh, 100vh);
   font-family: var(--font-system);
   font-size: 16px;
   color: var(--color-text);
@@ -92,7 +95,8 @@ button {
 .app {
   display: grid;
   grid-template-rows: auto 1fr auto;
-  min-height: 100dvh;
+  min-height: 100vh; /* 同步 body，避免 iOS standalone dvh 崩塌 */
+  min-height: var(--ios-vh, 100vh);
   padding:
     calc(var(--safe-top) + 4px)
     var(--safe-right)
@@ -380,13 +384,20 @@ button {
   z-index: 25;
 }
 
+/*
+ * AI 筹码标签向牌桌中心偏移 20%
+ * 调整方法：修改 left 百分比
+ *   - 左侧 AI：增大 left 值 → 向右（朝中心）移动
+ *   - 右侧 AI：减小 left 值 → 向左（朝中心）移动
+ * 当前值 70% / 30% 即代表向中心偏移 20%
+ */
 .ai-seat--left .seat-chips-overlay {
-  left: 150%;
+  left: 150%; /* 原值 50%，+20% 向右朝牌桌中心偏移 */
   transform: translateX(-50%);
 }
 
 .ai-seat--right .seat-chips-overlay {
-  left: -50%;
+  left: -50%; /* 原值 50%，-20% 向左朝牌桌中心偏移 */
   transform: translateX(-50%);
 }
 

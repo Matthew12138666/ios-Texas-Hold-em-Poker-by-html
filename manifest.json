@@ -3,7 +3,6 @@
   "name": "Texas Hold'em Poker Pro",
   "start_url": "index.html",
   "display": "standalone",
-  "orientation": "landscape",
   "background_color": "#0a1210",
   "theme_color": "#0a1210",
   "icons": [

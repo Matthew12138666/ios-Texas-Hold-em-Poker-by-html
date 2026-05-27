@@ -8,11 +8,23 @@
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
   <meta name="apple-mobile-web-app-title" content="Texas Hold'em Poker">
   <meta name="description" content="Texas Hold'em Poker">
+  <link rel="apple-touch-icon" href="icon.png">
   <title>Texas Hold'em Poker</title>
   <link rel="stylesheet" href="style.css">
   <link rel="manifest" href="manifest.json">
 </head>
 <body>
+  <!-- iOS standalone 视口高度修复：必须放在最前面，在 CSS 渲染前注入 -->
+  <script>
+    (function () {
+      var appHeight = window.innerHeight;
+      document.documentElement.style.setProperty("--ios-vh", appHeight + "px");
+      window.addEventListener("resize", function () {
+        var h = window.innerHeight;
+        document.documentElement.style.setProperty("--ios-vh", h + "px");
+      });
+    })();
+  </script>
   <div id="app" class="app">
     <header class="status-bar">
       <span class="status-bar__title">Texas Hold'em Poker</span>
