@@ -10,6 +10,7 @@
   <meta name="description" content="Texas Hold'em Poker">
   <title>Texas Hold'em Poker</title>
   <link rel="stylesheet" href="style.css">
+  <link rel="manifest" href="manifest.json">
 </head>
 <body>
   <div id="app" class="app">
@@ -67,7 +68,7 @@
 
     <button type="button" class="btn-skip-deal is-hidden" id="btn-skip-deal">Skip</button>
     <button type="button" class="btn-skip-showdown is-hidden" id="btn-skip-showdown">Skip</button>
-    <button type="button" class="btn-exit-game is-hidden" id="btn-exit-game">Exit game</button>
+
 
     <aside class="cheat-panel" id="cheat-panel">
       <button type="button" class="cheat-panel__toggle" id="cheat-toggle" aria-expanded="true">
@@ -216,5 +217,18 @@
   <script src="settings.js"></script>
   <script src="game.js"></script>
   <script src="ai-engine.js"></script>
+
+  <script>
+    (function () {
+      "use strict";
+      if ("serviceWorker" in navigator) {
+        navigator.serviceWorker.register("sw.js", { scope: "./" }).then(function (registration) {
+          console.log("PWA Ready");
+        }).catch(function (err) {
+          console.error("SW registration failed: " + err);
+        });
+      }
+    })();
+  </script>
 </body>
 </html>
